@@ -1,0 +1,7 @@
+USE_PYTHON_3_12; python_version != '3.12'
+sqlalchemy~=2.0.34
+python-dotenv~=0.21.0
+pandas~=2.2.2
+alembic~=1.15.2
+sqlalchemy_utils~=0.41.2
+psycopg2~=2.9.10

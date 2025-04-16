@@ -1,0 +1,4 @@
+DoctorID,DoctorTypeID,QualificationID,FirstName,LastName,MiddleName
+1,1,3,"Иван","Иванов","Иванович"
+2,2,1,"Жан","Жанжан","Жанжанович"
+3,3,2,"Петя","Пупкин",
