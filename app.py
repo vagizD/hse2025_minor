@@ -17,8 +17,8 @@ def main():
 
     # create migrations if applicable and run them
     commit_message = "INIT" if is_recreated else "AUTO_GENERATED_COMMIT"
-    # subprocess.run(['alembic', 'revision', '--autogenerate', '-m', f'"{commit_message}"'])
-    subprocess.run(['alembic', 'upgrade', 'head'])
+    # subprocess.run(['alembic', 'revision', '--autogenerate', '-m', f'"{commit_message}"'])  # new revision
+    subprocess.run(['alembic', 'upgrade', 'head'])                                            # upgrade head
 
     # insert initial data
     if is_recreated:
