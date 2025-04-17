@@ -7,7 +7,9 @@ from sqlalchemy import (
     Text,
     ForeignKey,
     Boolean,
-    CheckConstraint, PrimaryKeyConstraint
+    CheckConstraint,
+    PrimaryKeyConstraint,
+    ForeignKeyConstraint
 )
 from sqlalchemy.orm import declarative_base
 from datetime import datetime, timezone
@@ -109,39 +111,58 @@ class Doctor2Clinic(Base):
 class Schedule(Base):  # расписание врачей
     __tablename__ = "Schedule"
 
-    DoctorID = Column(Integer, ForeignKey("Doctor2Clinic.DoctorID"), nullable=False)
+    DoctorID = Column(Integer, nullable=False)
     Time     = Column(DateTime(timezone=True), nullable=False)
-    ClinicID = Column(Integer, ForeignKey("Doctor2Clinic.ClinicID"), nullable=False)
+    ClinicID = Column(Integer, nullable=False)
 
     __table_args__ = (
         PrimaryKeyConstraint("DoctorID", "Time", "ClinicID"),
+        ForeignKeyConstraint(
+            ["DoctorID", "ClinicID"],
+            ["Doctor2Clinic.DoctorID", "Doctor2Clinic.ClinicID"]
+        ),
     )
 
 
 class VisitRecords(Base):  # записи на приемы
     __tablename__ = "VisitRecords"
 
-    DoctorID      = Column(Integer, ForeignKey("Schedule.DoctorID"), nullable=False)
-    Time          = Column(DateTime(timezone=True), ForeignKey("Schedule.Time"), nullable=False)
+    DoctorID      = Column(Integer, nullable=False)
+    Time          = Column(DateTime(timezone=True), nullable=False)
     InsertionTime = Column(DateTime(timezone=True), nullable=False)
+    ClinicID      = Column(Integer, nullable=False)
     PatientID     = Column(Integer, ForeignKey("Patients.PatientID"), nullable=False)
     IsTaken       = Column(Boolean, nullable=False)
 
     __table_args__ = (
         PrimaryKeyConstraint("DoctorID", "Time", "InsertionTime"),
+        ForeignKeyConstraint(
+            ["DoctorID", "Time", "ClinicID"],
+            ["Schedule.DoctorID", "Schedule.Time", "Schedule.ClinicID"]
+        )
     )
 
 
 class Visits(Base):
     __tablename__ = "Visits"
 
-    DoctorID         = Column(Integer, ForeignKey("VisitRecords.DoctorID"), nullable=False)
-    Time             = Column(DateTime(timezone=True), ForeignKey("VisitRecords.Time"), nullable=False)
+    DoctorID         = Column(Integer, nullable=False)
+    Time             = Column(DateTime(timezone=True), nullable=False)
+    InsertionTime    = Column(DateTime(timezone=True), nullable=False)
+    ClinicID         = Column(Integer, nullable=False)
     PatientID        = Column(Integer, ForeignKey("Patients.PatientID"), nullable=False)
-    TreatmentID      = Column(Integer, ForeignKey("Doctor2Treatment.TreatmentID"), nullable=False)
+    TreatmentID      = Column(Integer, nullable=False)
     Talon            = Column(Text, nullable=False)
     # VisitDatetime    = Column(DateTime(timezone=True), nullable=False)  # зачем, если есть Time?
 
     __table_args__ = (
         PrimaryKeyConstraint("DoctorID", "Time"),
+        ForeignKeyConstraint(
+            ["DoctorID", "Time", "InsertionTime"],
+            ["VisitRecords.DoctorID", "VisitRecords.Time", "VisitRecords.InsertionTime"]
+        ),
+        ForeignKeyConstraint(
+            ["DoctorID", "TreatmentID"],
+            ["Doctor2Treatment.DoctorID", "Doctor2Treatment.TreatmentID"]
+        )
     )

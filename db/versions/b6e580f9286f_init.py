@@ -1,8 +1,8 @@
 """"INIT"
 
-Revision ID: 5b0ea44c3510
+Revision ID: b6e580f9286f
 Revises: 
-Create Date: 2025-04-16 23:54:32.090655
+Create Date: 2025-04-17 07:51:40.348481
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "5b0ea44c3510"
+revision: str = "b6e580f9286f"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -147,12 +147,8 @@ def upgrade() -> None:
         sa.Column("Time", sa.DateTime(timezone=True), nullable=False),
         sa.Column("ClinicID", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["ClinicID"],
-            ["Doctor2Clinic.ClinicID"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["DoctorID"],
-            ["Doctor2Clinic.DoctorID"],
+            ["DoctorID", "ClinicID"],
+            ["Doctor2Clinic.DoctorID", "Doctor2Clinic.ClinicID"],
         ),
         sa.PrimaryKeyConstraint("DoctorID", "Time", "ClinicID"),
     )
@@ -161,19 +157,16 @@ def upgrade() -> None:
         sa.Column("DoctorID", sa.Integer(), nullable=False),
         sa.Column("Time", sa.DateTime(timezone=True), nullable=False),
         sa.Column("InsertionTime", sa.DateTime(timezone=True), nullable=False),
+        sa.Column("ClinicID", sa.Integer(), nullable=False),
         sa.Column("PatientID", sa.Integer(), nullable=False),
         sa.Column("IsTaken", sa.Boolean(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["DoctorID"],
-            ["Schedule.DoctorID"],
+            ["DoctorID", "Time", "ClinicID"],
+            ["Schedule.DoctorID", "Schedule.Time", "Schedule.ClinicID"],
         ),
         sa.ForeignKeyConstraint(
             ["PatientID"],
             ["Patients.PatientID"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["Time"],
-            ["Schedule.Time"],
         ),
         sa.PrimaryKeyConstraint("DoctorID", "Time", "InsertionTime"),
     )
@@ -181,24 +174,26 @@ def upgrade() -> None:
         "Visits",
         sa.Column("DoctorID", sa.Integer(), nullable=False),
         sa.Column("Time", sa.DateTime(timezone=True), nullable=False),
+        sa.Column("InsertionTime", sa.DateTime(timezone=True), nullable=False),
+        sa.Column("ClinicID", sa.Integer(), nullable=False),
         sa.Column("PatientID", sa.Integer(), nullable=False),
         sa.Column("TreatmentID", sa.Integer(), nullable=False),
         sa.Column("Talon", sa.Text(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["DoctorID"],
-            ["VisitRecords.DoctorID"],
+            ["DoctorID", "Time", "InsertionTime"],
+            [
+                "VisitRecords.DoctorID",
+                "VisitRecords.Time",
+                "VisitRecords.InsertionTime",
+            ],
+        ),
+        sa.ForeignKeyConstraint(
+            ["DoctorID", "TreatmentID"],
+            ["Doctor2Treatment.DoctorID", "Doctor2Treatment.TreatmentID"],
         ),
         sa.ForeignKeyConstraint(
             ["PatientID"],
             ["Patients.PatientID"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["Time"],
-            ["VisitRecords.Time"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["TreatmentID"],
-            ["Doctor2Treatment.TreatmentID"],
         ),
         sa.PrimaryKeyConstraint("DoctorID", "Time"),
     )
