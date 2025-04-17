@@ -59,5 +59,14 @@ def insert_data(conn, data_dir: str, if_exists: Literal["fail", "replace", "appe
     for path in table_paths:
         table_name = os.path.basename(path).split(".")[0].split("-")[1]
         table = pd.read_csv(os.path.join(data_dir, path))
-        print(f"Inserting {table_name}...")
         table.to_sql(name=table_name, con=conn, if_exists=if_exists, index=False)
+
+@with_engine("Views creation failed.")
+def manage_views(conn, views: Dict[str, str], if_exists: Literal["fail", "replace"] = "create"):
+    """function for controlling views"""
+
+    manage_cmd = "CREATE" if if_exists == "fail" else "CREATE OR REPLACE"
+    template = f"""\n{manage_cmd} VIEW"""
+    for view_name, view_definition in views.items():
+        view_query = f"""{template} {view_name} AS\n{view_definition}"""
+        conn.execute(text(view_query))
