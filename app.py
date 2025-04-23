@@ -1,8 +1,8 @@
 import os
 import subprocess
 
-from db.utils import get_url, validate_database
-from db.queries import insert_data, manage_views
+from db.utils import get_url, validate_database, save_db
+from db.queries import insert_data, manage_views, save_views
 from db.views import VIEWS
 
 
@@ -27,6 +27,8 @@ def main():
         manage_views(url, views=VIEWS, if_exists="fail")
     else:
         manage_views(url, views=VIEWS, if_exists="replace")
+    save_views(url, path=os.path.join("db", "views"))
+    save_db("db.dump")
 
 
 if __name__ == "__main__":

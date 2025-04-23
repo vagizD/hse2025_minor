@@ -2,6 +2,7 @@ import os
 
 import sqlalchemy
 import inspect
+import subprocess
 from sqlalchemy import create_engine, text
 from sqlalchemy_utils import database_exists, create_database
 from typing import List, Dict
@@ -80,3 +81,24 @@ def get_attributes(
     if names_only:
         return list(attributes.keys())
     return attributes
+
+
+def save_db(filename: str):
+    username = os.getenv("DB_USERNAME")
+    host     = os.getenv("DB_HOST")
+    password = os.getenv("DB_PASSWORD")
+    port     = os.getenv("DB_PORT")
+    # driver   = os.getenv("DB_DRIVER")
+    name     = os.getenv("DB_NAME")
+
+    process = subprocess.Popen(
+        ['pg_dump',
+         '-h', host,
+         '-p', str(port),
+         '-U', username,
+         '-F', 'c',
+         '-f', filename,
+         name],
+        env={'PGPASSWORD': password}
+    )
+    process.wait()

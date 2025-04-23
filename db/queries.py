@@ -4,6 +4,7 @@ import pandas as pd
 from sqlalchemy import text
 from typing import List, Dict, Literal
 from db.utils import get_engine
+from db.views import VIEWS
 
 
 def with_engine(msg_error: str = "Query error.", echo: bool = False):
@@ -70,3 +71,15 @@ def manage_views(conn, views: Dict[str, str], if_exists: Literal["fail", "replac
     for view_name, view_definition in views.items():
         view_query = f"""{template} {view_name} AS\n{view_definition}"""
         conn.execute(text(view_query))
+
+
+@with_engine("Views save failed.")
+def save_views(conn, path: str = "views"):
+    """function for saving views to .csv"""
+
+    views_names = list(VIEWS.keys())
+    for view_name in views_names:
+        savepath = os.path.join(path, f"{view_name}.csv")
+        query = f"""SELECT * FROM {view_name}"""
+        df = pd.read_sql_query(query, conn)
+        df.to_csv(savepath)
