@@ -11,7 +11,7 @@ from sqlalchemy import (
     PrimaryKeyConstraint,
     ForeignKeyConstraint
 )
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import declarative_base, relationship
 from datetime import datetime, timezone
 
 
@@ -24,12 +24,18 @@ class DoctorTypes(Base):
     DoctorTypeID = Column(Integer, autoincrement=True, nullable=False, primary_key=True)
     DoctorType   = Column(Text, nullable=False)
 
+    # Add relationships
+    doctors = relationship("Doctors", back_populates="doctor_type")
+
 
 class Qualifications(Base):
     __tablename__ = "Qualifications"
 
     QualificationID = Column(Integer, autoincrement=True, nullable=False, primary_key=True)
     Qualification   = Column(Text, nullable=False)
+
+    # Add relationships
+    doctors = relationship("Doctors", back_populates="qualification")
 
 
 class Clinics(Base):
@@ -38,6 +44,18 @@ class Clinics(Base):
     ClinicID = Column(Integer, autoincrement=True, nullable=False, primary_key=True)
     Name     = Column(Text, nullable=False)
     Address  = Column(Text, nullable=False)
+
+    # Add relationships
+    doctors_association = relationship(
+        "Doctor2Clinic",
+        back_populates="clinic"
+    )
+    doctors = relationship(
+        "Doctors",
+        secondary="Doctor2Clinic",
+        viewonly=True,
+        back_populates="clinics"
+    )
 
 
 class Doctors(Base):
@@ -49,6 +67,20 @@ class Doctors(Base):
     FirstName       = Column(Text, nullable=False)
     LastName        = Column(Text, nullable=False)
     MiddleName      = Column(Text, nullable=True)
+
+    # Add relationships
+    doctor_type = relationship("DoctorTypes", back_populates="doctors")
+    qualification = relationship("Qualifications", back_populates="doctors")
+    clinics_association = relationship(
+        "Doctor2Clinic",
+        back_populates="doctor"
+    )
+    clinics = relationship(
+        "Clinics",
+        secondary="Doctor2Clinic",
+        viewonly=True,
+        back_populates="doctors"
+    )
 
 
 class Patients(Base):
@@ -68,6 +100,11 @@ class Patients(Base):
     Address         = Column(Text, nullable=False)
     Login           = Column(Text, nullable=False)
     Password        = Column(Text, nullable=False)
+
+    # Add relationships
+    clinic = relationship("Clinics")
+    cards = relationship("Cards", backref="patient")
+    visits = relationship("VisitRecords", backref="patient")
 
 
 class Cards(Base):
@@ -105,6 +142,16 @@ class Doctor2Clinic(Base):
 
     __table_args__ = (
         PrimaryKeyConstraint("ClinicID", "DoctorID"),
+    )
+
+    # Add relationships
+    clinic = relationship(
+        "Clinics",
+        back_populates="doctors_association"
+    )
+    doctor = relationship(
+        "Doctors",
+        back_populates="clinics_association"
     )
 
 

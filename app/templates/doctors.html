@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Our Doctors{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Our Medical Specialists</h1>
+
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <form class="d-flex">
+                <input class="form-control me-2" type="search" placeholder="Search doctors..." aria-label="Search">
+                <button class="btn btn-outline-primary" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+        </div>
+        <div class="col-md-6 text-end">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="specialtyDropdown" data-bs-toggle="dropdown">
+                    <i class="bi bi-filter"></i> Filter by Specialty
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="specialtyDropdown">
+                    {% for type in doctor_types %}
+                    <li><a class="dropdown-item" href="#">{{ type.DoctorType }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doctors Grid -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for doctor in doctors %}
+        <div class="col">
+            <div class="card h-100 doctor-card">
+                <div class="card-header bg-light d-flex justify-content-between">
+                    <span class="badge bg-primary">{{ doctor.doctor_type.DoctorType }}</span>
+                    {% if doctor.qualification %}
+                    <span class="badge bg-success">{{ doctor.qualification.Qualification }}</span>
+                    {% endif %}
+                </div>
+                <div class="card-body text-center">
+                    <img src="{{ url_for('static', filename='img/doctor-placeholder.jpg') }}"
+                         class="rounded-circle mb-3 border border-3 border-primary"
+                         alt="Doctor"
+                         width="120"
+                         height="120">
+                    <h4 class="card-title mb-1">Dr. {{ doctor.LastName }}</h4>
+                    <h5 class="text-muted mb-3">{{ doctor.FirstName }} {{ doctor.MiddleName or '' }}</h5>
+
+                    <div class="d-flex flex-wrap justify-content-center gap-1 mb-3">
+                        {% for clinic in doctor.clinics %}
+                        <span class="badge bg-light text-dark">{{ clinic.Name }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-primary">View Profile</a>
+                        <a href="#" class="btn btn-primary">Book Appointment</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .doctor-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .doctor-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .card-title {
+        font-weight: 600;
+    }
+</style>
+{% endblock %}

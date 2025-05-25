@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Doctor Specialties & Qualifications{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1>Doctor Specialties & Qualifications</h1>
+        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Home
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Doctor Types Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3><i class="bi bi-heart-pulse"></i> Medical Specialties</h3>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for type in doctor_types %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-1">{{ type.DoctorType }}</h5>
+                                <span class="badge bg-primary rounded-pill">
+                                    {{ type.doctors|length }} doctors
+                                </span>
+                            </div>
+                            {% if type.doctors %}
+                            <div class="mt-2">
+                                <h6>Specialists:</h6>
+                                <div class="d-flex flex-wrap gap-2">
+                                    {% for doctor in type.doctors %}
+                                    <span class="badge bg-light text-dark">
+                                        Dr. {{ doctor.LastName }}
+                                        {% if doctor.qualification %}
+                                        ({{ doctor.qualification.Qualification }})
+                                        {% endif %}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Qualifications Section -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h3><i class="bi bi-award"></i> Professional Qualifications</h3>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for qual in qualifications %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-1">{{ qual.Qualification }}</h5>
+                                <span class="badge bg-success rounded-pill">
+                                    {{ qual.doctors|length }} doctors
+                                </span>
+                            </div>
+                            {% if qual.doctors %}
+                            <div class="mt-2">
+                                <h6>Holders:</h6>
+                                <div class="d-flex flex-wrap gap-2">
+                                    {% for doctor in qual.doctors %}
+                                    <span class="badge bg-light text-dark">
+                                        Dr. {{ doctor.LastName }}
+                                        ({{ doctor.doctor_type.DoctorType }})
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

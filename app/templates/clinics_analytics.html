@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Clinics Analytics{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+        <div class="row mb-4">
+        <div class="col">
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Return to Home
+            </a>
+        </div>
+    </div>
+
+    <h1 class="text-center mb-5">Clinics Performance Analytics</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5>Visits by Clinic</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="visitsChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5>Patients by Clinic</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="patientsChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h4>Clinic Performance Metrics</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Clinic</th>
+                            <th>Total Visits</th>
+                            <th>Unique Patients</th>
+                            <th>Avg Visits per Patient</th>
+                            <th>Utilization Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for clinic in clinics %}
+                        <tr>
+                            <td>{{ clinic.clinic_name }}</td>
+                            <td>{{ clinic.n_visits }}</td>
+                            <td>{{ clinic.n_patients }}</td>
+                            <td>{{ "%.1f"|format(clinic.n_visits/clinic.n_patients) if clinic.n_patients > 0 else 0 }}</td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar"
+                                         style="width: {{ clinic.utilization }}%"
+                                         aria-valuenow="{{ clinic.utilization }}"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                        {{ clinic.utilization }}%
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-light">
+            <h4>Clinic Comparison</h4>
+        </div>
+        <div class="card-body">
+            <canvas id="comparisonChart" height="100"></canvas>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Visits by Clinic Chart
+    const visitsCtx = document.getElementById('visitsChart').getContext('2d');
+    new Chart(visitsCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ clinic_names|tojson }},
+            datasets: [{
+                label: 'Number of Visits',
+                data: {{ visit_counts|tojson }},
+                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    // Patients by Clinic Chart
+    const patientsCtx = document.getElementById('patientsChart').getContext('2d');
+    new Chart(patientsCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ clinic_names|tojson }},
+            datasets: [{
+                data: {{ patient_counts|tojson }},
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 206, 86, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(153, 102, 255, 0.7)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'right' }
+            }
+        }
+    });
+
+    // Comparison Chart
+    const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+    new Chart(comparisonCtx, {
+        type: 'radar',
+        data: {
+            labels: ['Visits', 'Patients', 'Efficiency', 'Satisfaction', 'Revenue'],
+            datasets: [
+                {% for clinic in clinics %}
+                {
+                    label: '{{ clinic.clinic_name }}',
+                    data: [
+                        {{ clinic.n_visits }},
+                        {{ clinic.n_patients }},
+                        {{ clinic.n_visits/clinic.n_patients if clinic.n_patients > 0 else 0 }},
+                        {{ clinic.utilization }},
+                        {{ clinic.n_visits * 100 }} // Example revenue calculation
+                    ],
+                    backgroundColor: 'rgba({{ loop.index * 50 }}, {{ loop.index * 80 }}, 235, 0.2)',
+                    borderColor: 'rgba({{ loop.index * 50 }}, {{ loop.index * 80 }}, 235, 1)',
+                    pointBackgroundColor: 'rgba({{ loop.index * 50 }}, {{ loop.index * 80 }}, 235, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba({{ loop.index * 50 }}, {{ loop.index * 80 }}, 235, 1)'
+                },
+                {% endfor %}
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                r: {
+                    angleLines: { display: true },
+                    suggestedMin: 0
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

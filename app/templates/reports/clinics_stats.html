@@ -1,0 +1,120 @@
+{% extends "reports/base.html" %}
+
+{% block title %}Clinic Statistics{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>{% block report_title %}{% endblock %}</h1>
+    <div>
+        <a href="{{ url_for('reports_index') }}" class="btn btn-outline-secondary me-2">
+            <i class="bi bi-arrow-left"></i> All Reports
+        </a>
+        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-house"></i> Home
+        </a>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5>Clinic Visits Overview</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="clinicVisitsChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5>Top Clinics by Patient Count</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="clinicPatientsChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h4>Detailed Clinic Statistics</h4>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Clinic</th>
+                    <th>Total Visits</th>
+                    <th>Unique Patients</th>
+                    <th>Visits per Patient</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for clinic in clinics %}
+                <tr>
+                    <td>{{ clinic.clinic_name }}</td>
+                    <td>{{ clinic.n_visits }}</td>
+                    <td>{{ clinic.n_patients }}</td>
+                    <td>{{ "%.1f"|format(clinic.n_visits/clinic.n_patients) if clinic.n_patients > 0 else 0 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Clinic Visits Chart
+        const visitsCtx = document.getElementById('clinicVisitsChart').getContext('2d');
+        new Chart(visitsCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ clinic_names|tojson }},
+                datasets: [{
+                    label: 'Number of Visits',
+                    data: {{ visit_counts|tojson }},
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // Clinic Patients Chart
+        const patientsCtx = document.getElementById('clinicPatientsChart').getContext('2d');
+        new Chart(patientsCtx, {
+            type: 'doughnut',
+            data: {
+                labels: {{ clinic_names|tojson }},
+                datasets: [{
+                    data: {{ patient_counts|tojson }},
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(153, 102, 255, 0.7)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'right' }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

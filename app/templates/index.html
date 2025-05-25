@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinic Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8 mx-auto text-center">
+                <h1 class="mb-4">Welcome to Our Clinic Network</h1>
+                <p class="lead">Quality healthcare services for you and your family</p>
+
+                <div class="row mt-5">
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Find a Doctor</h5>
+                                <p class="card-text">Browse our specialists and book an appointment</p>
+                                <a href="{{ url_for('doctors') }}" class="btn btn-primary">View Doctors</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Patient Portal</h5>
+                                <p class="card-text">Access your medical records and appointments</p>
+                                <a href="{{ url_for('patient_login') }}" class="btn btn-primary">Login</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Our Clinics</h5>
+                                <p class="card-text">Find locations and contact information</p>
+                                <a href="{{ url_for('clinics') }}" class="btn btn-primary">View Clinics</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Doctor Specialties</h5>
+                                <p class="card-text">Browse all medical specialties and qualifications</p>
+                                <a href="{{ url_for('doctor_specialties') }}" class="btn btn-primary">
+                                    View Catalog
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Clinics Analytics</h5>
+                                <p class="card-text">View detailed statistics and performance metrics</p>
+                                <a href="{{ url_for('clinics_analytics') }}" class="btn btn-primary">View Analytics</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Analytics Reports</h5>
+                                <p class="card-text">Access all clinic performance reports and statistics</p>
+                                <a href="{{ url_for('reports_index') }}" class="btn btn-primary">
+                                    View Reports Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

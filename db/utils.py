@@ -4,7 +4,8 @@ import sqlalchemy
 import inspect
 import subprocess
 from sqlalchemy import create_engine, text
-from sqlalchemy_utils import database_exists, create_database
+from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy_utils import database_exists, create_database, drop_database
 from typing import List, Dict
 
 from dotenv import load_dotenv
@@ -31,8 +32,21 @@ def get_engine(url: str, echo: bool = False) -> sqlalchemy.Engine:
     engine = create_engine(url, echo=echo)
     return engine
 
+def get_session(url: str) -> Session:
+    engine = get_engine(url)
+    session_pool = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    try:
+        session = session_pool()
+        try:
+            yield session
+        finally:
+            session.close()
+    finally:
+        session_pool.close_all()
+        engine.dispose()
 
-def validate_database(url: str) -> bool:
+
+def validate_database(url: str, drop_existing: bool = False) -> bool:
     engine = create_engine(url)
     is_recreated = False
     if not database_exists(engine.url): # Checks for the first time
@@ -41,14 +55,12 @@ def validate_database(url: str) -> bool:
         is_recreated = True
     else:
         print(f"{engine.url}: Database Already Exists")
-        # if drop_existing:
-        #     with engine.connect() as conn:
-        #         conn.autocommit = True
-        #         conn.execute(text("DROP DATABASE crypta_db WITH (FORCE)"))
-        #     print(f"{engine.url}: Database Dropped")
-        #     create_database(engine.url)
-        #     print(f"{engine.url}: New Database Created")
-        #     is_recreated = True
+        if drop_existing:
+            drop_database(engine.url)
+            print(f"{engine.url}: Database Dropped")
+            create_database(engine.url)
+            print(f"{engine.url}: New Database Created")
+            is_recreated = True
 
     engine.dispose()
     return is_recreated

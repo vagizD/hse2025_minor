@@ -1,0 +1,51 @@
+{% extends "patient/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">My Profile</h5>
+                <div class="my-3">
+                    <i class="bi bi-person-circle" style="font-size: 3rem;"></i>
+                </div>
+                <h4>{{ patient.FirstName }} {{ patient.LastName }}</h4>
+                <p class="text-muted">{{ patient.clinic.Name }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5>Upcoming Appointments</h5>
+            </div>
+            <div class="card-body">
+                {% if patient.visits %}
+                    <div class="list-group">
+                        {% for visit in patient.visits if visit.Time > datetime.now() %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6>Dr. {{ visit.doctor.LastName }}</h6>
+                                    <small class="text-muted">{{ visit.doctor.doctor_type.DoctorType }}</small>
+                                </div>
+                                <div class="text-end">
+                                    <strong>{{ visit.Time.strftime('%B %d, %Y') }}</strong><br>
+                                    <small>{{ visit.Time.strftime('%I:%M %p') }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-muted">No upcoming appointments</p>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No appointments scheduled</p>
+                {% endif %}
+                <a href="#" class="btn btn-primary mt-3">Book New Appointment</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}{{ clinic.Name }} Details{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3>{{ clinic.Name }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><i class="bi bi-geo-alt"></i> Address</h5>
+                            <p>{{ clinic.Address }}</p>
+
+                            <h5 class="mt-4"><i class="bi bi-clock"></i> Working Hours</h5>
+                            <p>Monday - Friday: 8:00 AM - 8:00 PM</p>
+                            <p>Saturday: 9:00 AM - 5:00 PM</p>
+                            <p>Sunday: Closed</p>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="ratio ratio-16x9">
+                                <iframe
+                                    src="https://maps.google.com/maps?q={{ clinic.Address|urlencode }}&output=embed"
+                                    allowfullscreen>
+                                </iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h4>Available Specialties</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for type in doctor_types %}
+                        <span class="badge bg-primary rounded-pill p-2">
+                            <i class="bi bi-heart-pulse me-1"></i> {{ type.DoctorType }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h4>Our Doctors</h4>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for association in clinic.doctors_association %}
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Dr. {{ association.doctor.LastName }}</h6>
+                                <small class="text-muted">{{ association.doctor.doctor_type.DoctorType }}</small>
+                            </div>
+                            <small class="text-muted">
+                                {% if association.doctor.qualification %}
+                                {{ association.doctor.qualification.Qualification }}
+                                {% endif %}
+                            </small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header bg-light">
+                    <h4>Book an Appointment</h4>
+                </div>
+                <div class="card-body">
+                    <p>Ready to schedule your visit?</p>
+                    <a href="{{ url_for('doctors') }}?clinic={{ clinic.ClinicID }}" class="btn btn-primary w-100">
+                        Find a Doctor
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
